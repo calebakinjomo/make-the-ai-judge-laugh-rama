@@ -21,11 +21,21 @@ ENTRY = (
 )
 
 
+MAX_ENTRY_CHARS = 280
+
+
 def main() -> None:
     if not ENTRY or "\n" in ENTRY or "\r" in ENTRY:
         raise ValueError("ENTRY must be a single non-empty line")
-    os.makedirs("/output", exist_ok=True)
-    with open("/output/entry.txt", "w", encoding="utf-8") as f:
+    if len(ENTRY) > MAX_ENTRY_CHARS:
+        raise ValueError("ENTRY exceeds the %d-character limit" % MAX_ENTRY_CHARS)
+    if ENTRY != ENTRY.strip():
+        raise ValueError("ENTRY must not have leading or trailing whitespace")
+    output_path = os.environ.get("ENTRY_OUTPUT", "/output/entry.txt")
+    parent = os.path.dirname(output_path)
+    if parent:
+        os.makedirs(parent, exist_ok=True)
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write(ENTRY)
 
 
